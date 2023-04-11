@@ -1,133 +1,246 @@
-<?php session_start(); ?>
-<?php include('dbcon.php'); ?>
+<?php
+
+session_start();
+//the isset function to check username is already loged in and stored on the session
+if(!isset($_SESSION['user_id'])){
+header('location:../index.php');	
+}
+
+include "dbconnect.php";
+$qry="SELECT bloodgroup, count(*) as number FROM blood GROUP BY bloodgroup";
+$result= mysqli_query($conn,$qry);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="">
+<head>
 
-        <title>BDMS - Admin Panel</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-        <!-- Bootstrap Core CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>BDMS</title>
 
-        <!-- MetisMenu CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/metismenu/dist/metisMenu.min.css">
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Custom CSS -->
-        <link href="css/startmin.css" rel="stylesheet">
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
 
-        <link rel="stylesheet" href="/bloodbank se/icofont/icofont.min.css">
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
 
-        <!-- Custom Fonts -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/fontawesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Morris Charts CSS -->
+    <link href="../vendor/morrisjs/morris.css" rel="stylesheet">
 
-       
-    </head>
-    <body>
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="../icofont/icofont.min.css">
 	
-		<nav class="navbar navbar-inverse">
-			  <div class="container-fluid">
-				<div class="navbar-header">
-                <a class="navbar-brand" href="index.php"><i class="icofont-blood-drop"></i>Blood Donor Management System</a>
-				</div>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
 
-				<ul class="nav navbar-nav navbar-right">
-				  <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li> -->
-				  <li><a href="userlog/userlogin.php" ><span class="glyphicon glyphicon-user" style="color:#00A10F;"></span> User Login</a></li>
-				</ul>
-			  </div>
-		</nav>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+	<script type="text/javascript">  
+           google.charts.load('current', {'packages':['corechart']});  
+           google.charts.setOnLoadCallback(drawChart);  
+           function drawChart()  
+           {  
+                var data = google.visualization.arrayToDataTable([  
+                          ['Gender', 'Number'],  
+                          <?php  
+                          while($row = mysqli_fetch_array($result))  
+                          {  
+                               echo "['".$row["bloodgroup"]."', ".$row["number"]."],";  
+                          }  
+                          ?>  
+                     ]);  
+                var options = {  
+                      title: 'Total Available Blood According to Blood Groups',  
+                      is3D:true,  
+                      pieHole: 0.0 
+                     };  
+                var chart = new google.visualization.PieChart(document.getElementById('piechart'));  
+                chart.draw(data, options);  
+           }  
+           </script>
 
-        <div class="container">
-		 <form action="#" method="post">
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <?php include 'includes/nav.php'?>
+
+        <div id="page-wrapper">
             <div class="row">
-                <div class="col-md-4 col-md-offset-4">
-                    <div class="login-panel panel panel-default">
-                    <div class="image">
-						<img src="C:\xampp\htdocs\blood-donorms-PHP\blood-donorms-PHP\userlog\img\getimage.jpg">
-					</div>
+                <div class=".col-lg-12">
+                    <h1 class="page-header">Admin Dashboard</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+            <!-- /.row -->
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><center>Admin Login</center></h3>
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-users fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                     
+                                <!-- in order to count total donor's record -->
+                                        <?php include 'counter/dashboardcount.php';?> 
+
+                                    <!-- <div class="huge">26</div> -->
+                                    <div>Total Donors</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="panel-body">
-                            <form role="form">
-                                <fieldset>
-                                    <div class="form-group">
-                                        <input class="form-control" placeholder="Username" name="user" type="text" autofocus>
-                                    </div>
-                                    <div class="form-group">
-                                        <input class="form-control" placeholder="Password" name="pass" type="password" value="">
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                                        </label>
-                                    </div>
-                                    <!-- Change this to a button or input when using this as a form -->
-                                    <input type="submit" class="btn btn-info btn-block" style="border-radius:0%;" title="Log In" name="login" value="Login"></input>
-                                </fieldset>
-                                
-                            </form>
-                            
+                        
+                        <a href="viewdonor.php">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                <i class="icofont-blood icofont-5x"></i>
+                                    <!-- <i class="fa fa-heartbeat fa-5x"></i> -->
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <!-- in order to count total donor's record -->
+                                    <?php include 'counter/dashbloodcount.php';?> 
+                                    
+                                    <div>Available Blood</div>
+                                </div>
+                            </div>
                         </div>
+                        <a href="viewblood.php">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-bullhorn fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                <?php include 'counter/dashannouncecount.php';?>
+                                    <div class="huge"> </div>
+                                    <div>Announcement</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="viewannouncement.php">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                <i class="icofont-blood-drop icofont-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">Donate</div>
+                                    <div>Blood</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="addblood.php">
+                            <div class="panel-footer">
+                                <span class="pull-left">Donate Blood Now!</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
-			</form>
+            <!-- /.row -->
+            <div class="row">
 			
-			<?php
-				if (isset($_POST['login']))
-					{
-						$username = mysqli_real_escape_string($con, $_POST['user']);
-						$password = mysqli_real_escape_string($con, $_POST['pass']);
+				<div class=".col-lg-12">
+				
+				<div id="content">
+					 
+					  <div class="container-fluid">
 						
-						$query 		= mysqli_query($con, "SELECT * FROM admin WHERE  password='$password' and username='$username'");
-						$row		= mysqli_fetch_array($query);
-						$num_row 	= mysqli_num_rows($query);
-						
-						if ($num_row > 0) 
-							{			
-								$_SESSION['user_id']=$row['user_id'];
-								header('location:pages/index.php');
-								
-							}
-						else
-							{
-								echo ' <div class="row"> <div class="col-md-4 col-md-offset-4">
-								<div class="alert alert-danger alert-dismissible">
-                                        Username & Password didnot match! Try Again.
-                                    </div> </div> </div> ';
-									
-									
-							}
-					}
-			  ?>
+						<div class="row-fluid">
+						  
+						  <div class="span12">
+							
+							<div id="piechart" style="width: 690px; height: 320px; margin-left:auto; margin-right:auto;"></div>  
+
+						  </div>
+						</div>
+					  </div>
+				</div>
 			
+				</div>
+
+           </div>
+                <!-- /.col-lg-8 -->
+                
+                <!-- /.col-lg-4 -->
+            </div>
+            <!-- /.row -->
         </div>
+        <!-- /#page-wrapper -->
 
-        
+    </div>
+    <!-- /#wrapper -->
 
-        <!-- jQuery -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+    <!-- jQuery -->
+    <script src="../vendor/jquery/jquery.min.js"></script>
 
-        <!-- Bootstrap Core JavaScript -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.5.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
-        <!-- Metis Menu Plugin JavaScript -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/metisMenu/3.0.6/metisMenu.min.js">
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="../vendor/metisMenu/metisMenu.min.js"></script>
 
-        <!-- Custom Theme JavaScript -->
-        <script src="js/startmin.js"></script>
-		
-		
+    <!-- Morris Charts JavaScript -->
+    <script src="../vendor/raphael/raphael.min.js"></script>
+    <script src="../vendor/morrisjs/morris.min.js"></script>
+    <script src="../data/morris-data.js"></script>
 
-    </body>
-    
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+</body>
+
+
 </html>
-  
-  
